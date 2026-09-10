@@ -86,37 +86,12 @@
   header.top{
     display:flex;
     flex-wrap:wrap;
-    align-items:flex-end;
-    justify-content:space-between;
+    align-items:center;
+    justify-content:flex-end;
     gap:10px 24px;
     padding-bottom:18px;
     border-bottom:2px solid var(--accent);
     margin-bottom:22px;
-  }
-  .brand{display:flex; flex-direction:column; gap:6px; max-width:56ch;}
-  .eyebrow{
-    font-family:"Archivo", sans-serif;
-    font-weight:700;
-    font-size:0.68rem;
-    letter-spacing:0.12em;
-    text-transform:uppercase;
-    color:var(--rose);
-    margin:0;
-  }
-  h1{
-    font-family:"Archivo", system-ui, sans-serif;
-    font-weight:800;
-    font-size:clamp(1.5rem, 1.1rem + 1.6vw, 2.05rem);
-    letter-spacing:-0.01em;
-    margin:0;
-    text-wrap:balance;
-    color:var(--ink);
-  }
-  .tagline{
-    color:var(--ink-muted);
-    font-size:0.92rem;
-    margin:0;
-    line-height:1.5;
   }
   .stat{
     font-family:"IBM Plex Mono", monospace;
@@ -407,11 +382,6 @@
 <div class="wrap">
 
   <header class="top">
-    <div class="brand">
-      <p class="eyebrow">Road to Top 5 · Link Prospecting</p>
-      <h1>The Link Farmer</h1>
-      <p class="tagline">Stack Google search-operator footprints to surface guest-post calls, resource pages, link roundups, citations and more.</p>
-    </div>
     <div class="stat"><b id="footprintTotal">—</b> footprints · <b id="categoryTotal">—</b> categories</div>
   </header>
 
