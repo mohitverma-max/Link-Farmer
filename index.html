@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Link Farmer</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+  :root{
+    --bg:#f5f7f9;
+    --surface:#ffffff;
+    --surface-2:#e9f6f1;
+    --surface-3:#dbe6e1;
+    --border:#cfd9d5;
+    --ink:#142236;
+    --ink-muted:#54595f;
+    --ink-faint:#8996a0;
+    --accent:#1aab7f;
+    --accent-contrast:#ffffff;
+    --accent-tint:#d9f2e9;
+    --accent-tint-ink:#0b3d2c;
+    --rose:#cc3366;
+    --rose-tint:#f9e3ea;
+    --danger:#a3453a;
+    --danger-tint:#f5e3e0;
+    --shadow: 0 1px 0 rgba(20,34,54,0.05);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#0a121c;
+      --surface:#101c29;
+      --surface-2:#12261f;
+      --surface-3:#1b2e28;
+      --border:#28373f;
+      --ink:#e9eef4;
+      --ink-muted:#9aa7b2;
+      --ink-faint:#657079;
+      --accent:#3ed9a6;
+      --accent-contrast:#062018;
+      --accent-tint:#15382d;
+      --accent-tint-ink:#a8f0d7;
+      --rose:#ff7fa8;
+      --rose-tint:#3a1c28;
+      --danger:#e2897c;
+      --danger-tint:#3a2320;
+      --shadow: 0 1px 0 rgba(0,0,0,0.35);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0a121c;
+    --surface:#101c29;
+    --surface-2:#12261f;
+    --surface-3:#1b2e28;
+    --border:#28373f;
+    --ink:#e9eef4;
+    --ink-muted:#9aa7b2;
+    --ink-faint:#657079;
+    --accent:#3ed9a6;
+    --accent-contrast:#062018;
+    --accent-tint:#15382d;
+    --accent-tint-ink:#a8f0d7;
+    --rose:#ff7fa8;
+    --rose-tint:#3a1c28;
+    --danger:#e2897c;
+    --danger-tint:#3a2320;
+    --shadow: 0 1px 0 rgba(0,0,0,0.35);
+  }
+
+  *{box-sizing:border-box;}
+  html{color-scheme:light dark;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:"IBM Plex Sans", system-ui, -apple-system, sans-serif;
+    padding-inline:20px;
+    padding-block:36px 64px;
+    -webkit-font-smoothing:antialiased;
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:0.001ms !important; transition-duration:0.001ms !important;}
+  }
+
+  .wrap{max-width:960px; margin:0 auto;}
+
+  header.top{
+    display:flex;
+    flex-wrap:wrap;
+    align-items:flex-end;
+    justify-content:space-between;
+    gap:10px 24px;
+    padding-bottom:18px;
+    border-bottom:2px solid var(--accent);
+    margin-bottom:22px;
+  }
+  .brand{display:flex; flex-direction:column; gap:6px; max-width:56ch;}
+  .eyebrow{
+    font-family:"Archivo", sans-serif;
+    font-weight:700;
+    font-size:0.68rem;
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    color:var(--rose);
+    margin:0;
+  }
+  h1{
+    font-family:"Archivo", system-ui, sans-serif;
+    font-weight:800;
+    font-size:clamp(1.5rem, 1.1rem + 1.6vw, 2.05rem);
+    letter-spacing:-0.01em;
+    margin:0;
+    text-wrap:balance;
+    color:var(--ink);
+  }
+  .tagline{
+    color:var(--ink-muted);
+    font-size:0.92rem;
+    margin:0;
+    line-height:1.5;
+  }
+  .stat{
+    font-family:"IBM Plex Mono", monospace;
+    font-size:0.78rem;
+    color:var(--ink-faint);
+    white-space:nowrap;
+  }
+  .stat b{color:var(--accent); font-weight:600;}
+
+  .tabs{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+    margin-bottom:20px;
+  }
+  .tab{
+    font-family:"Archivo", sans-serif;
+    font-weight:600;
+    font-size:0.75rem;
+    letter-spacing:0.02em;
+    text-transform:uppercase;
+    color:var(--ink-muted);
+    background:transparent;
+    border:1px solid var(--border);
+    border-radius:7px;
+    padding:8px 12px;
+    cursor:pointer;
+  }
+  .tab:hover{border-color:var(--ink-faint); color:var(--ink);}
+  .tab:focus-visible, button:focus-visible, a.btn:focus-visible, input:focus-visible, select:focus-visible{
+    outline:2px solid var(--accent);
+    outline-offset:2px;
+  }
+  .tab.is-active{
+    background:var(--ink);
+    border-color:var(--ink);
+    color:var(--bg);
+  }
+
+  main.bench{
+    display:grid;
+    grid-template-columns: 1.05fr 0.95fr;
+    gap:18px;
+    align-items:start;
+  }
+  @media (max-width: 740px){
+    main.bench{grid-template-columns:1fr;}
+  }
+
+  .panel{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:12px;
+    box-shadow:var(--shadow);
+    padding:18px 18px 20px;
+  }
+  .panel h2{
+    font-family:"Archivo", sans-serif;
+    font-size:0.7rem;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:0.08em;
+    color:var(--rose);
+    margin:0 0 14px;
+  }
+
+  .field{margin-bottom:14px;}
+  .field label{
+    display:block;
+    font-size:0.72rem;
+    font-weight:600;
+    text-transform:uppercase;
+    letter-spacing:0.06em;
+    color:var(--ink-faint);
+    margin-bottom:7px;
+  }
+  input[type="text"], select{
+    width:100%;
+    font-family:"IBM Plex Mono", monospace;
+    font-size:0.92rem;
+    padding:9px 11px;
+    border:1px solid var(--border);
+    border-radius:8px;
+    background:var(--surface-2);
+    color:var(--ink);
+  }
+  select{font-family:"IBM Plex Sans", sans-serif; font-size:0.85rem;}
+  input::placeholder{color:var(--ink-faint);}
+
+  .two-col{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
+  @media (max-width:480px){.two-col{grid-template-columns:1fr;}}
+
+  .noise-row{display:flex; flex-wrap:wrap; gap:6px; margin-top:8px;}
+  .noise-chip{
+    font-family:"IBM Plex Mono", monospace;
+    font-size:0.72rem;
+    color:var(--ink-muted);
+    background:var(--surface-2);
+    border:1px solid var(--border);
+    border-radius:20px;
+    padding:4px 10px;
+    cursor:pointer;
+  }
+  .noise-chip.is-active{
+    background:var(--danger-tint);
+    border-color:var(--danger);
+    color:var(--danger);
+    font-weight:600;
+  }
+
+  .footprint-count{
+    font-size:0.76rem;
+    color:var(--ink-faint);
+    margin:0 0 9px;
+    font-family:"IBM Plex Mono", monospace;
+  }
+  .chips{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+    max-height:280px;
+    overflow-y:auto;
+    padding-right:2px;
+  }
+  .chip{
+    font-family:"IBM Plex Mono", monospace;
+    font-size:0.77rem;
+    text-align:left;
+    color:var(--ink-muted);
+    background:var(--surface-2);
+    border:1px solid var(--border);
+    border-radius:6px;
+    padding:6px 9px;
+    cursor:pointer;
+    line-height:1.3;
+  }
+  .chip:hover{border-color:var(--ink-faint); color:var(--ink);}
+  .chip.is-selected{
+    background:var(--accent);
+    border-color:var(--accent);
+    color:var(--accent-contrast);
+    font-weight:600;
+  }
+
+  .query-label{
+    display:flex; justify-content:space-between; align-items:baseline;
+    margin-bottom:7px;
+  }
+  .query-label label{margin:0;}
+  .copy-btn{
+    background:none; border:none; color:var(--accent);
+    font-family:"IBM Plex Mono", monospace;
+    font-size:0.72rem;
+    font-weight:600;
+    cursor:pointer;
+    padding:2px 4px;
+  }
+  .copy-btn:hover{text-decoration:underline;}
+
+  .query-box{
+    font-family:"IBM Plex Mono", monospace;
+    font-size:0.85rem;
+    line-height:1.55;
+    background:var(--surface-2);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:12px 13px;
+    min-height:64px;
+    word-break:break-word;
+    color:var(--ink-muted);
+    margin-bottom:14px;
+  }
+  .tok-site{color:var(--accent); font-weight:600;}
+  .tok-phrase{color:var(--ink);}
+  .tok-exclude{color:var(--danger);}
+
+  .seg-row{margin-top:12px;}
+  .seg-row label{
+    display:flex; align-items:baseline; gap:8px;
+    font-size:0.72rem;
+    font-weight:600;
+    text-transform:uppercase;
+    letter-spacing:0.06em;
+    color:var(--ink-faint);
+    margin-bottom:7px;
+  }
+  .seg-note{
+    font-size:0.68rem;
+    font-weight:400;
+    text-transform:none;
+    letter-spacing:0;
+    color:var(--ink-faint);
+    font-style:italic;
+  }
+  .seg{
+    display:flex;
+    border:1px solid var(--border);
+    border-radius:8px;
+    overflow:hidden;
+  }
+  .seg button{
+    flex:1;
+    font-family:"IBM Plex Sans", sans-serif;
+    font-size:0.76rem;
+    font-weight:500;
+    background:var(--surface);
+    color:var(--ink-muted);
+    border:none;
+    border-right:1px solid var(--border);
+    padding:8px 4px;
+    cursor:pointer;
+  }
+  .seg button:last-child{border-right:none;}
+  .seg button.is-active{
+    background:var(--ink);
+    color:var(--bg);
+  }
+
+  .actions{
+    display:flex;
+    gap:10px;
+    margin-top:16px;
+    flex-wrap:wrap;
+  }
+  .btn{
+    font-family:"Archivo", sans-serif;
+    font-weight:700;
+    font-size:0.86rem;
+    text-decoration:none;
+    border-radius:8px;
+    padding:11px 18px;
+    cursor:pointer;
+    border:1px solid transparent;
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+  }
+  .btn.primary{
+    background:var(--accent);
+    color:var(--accent-contrast);
+    border-color:var(--accent);
+  }
+  .btn.primary:hover{filter:brightness(0.93);}
+  .btn.ghost{
+    background:transparent;
+    color:var(--ink-muted);
+    border-color:var(--border);
+  }
+  .btn.ghost:hover{color:var(--ink); border-color:var(--ink-faint);}
+
+  .recent{margin-top:22px; padding-top:16px; border-top:1px solid var(--border);}
+  .recent-list{display:flex; flex-wrap:wrap; gap:7px;}
+  .recent-chip{
+    font-family:"IBM Plex Mono", monospace;
+    font-size:0.74rem;
+    color:var(--ink-muted);
+    background:var(--surface-2);
+    border:1px solid var(--border);
+    border-radius:20px;
+    padding:5px 12px;
+    cursor:pointer;
+    text-decoration:none;
+    max-width:280px;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+    display:inline-block;
+  }
+  .recent-chip:hover{border-color:var(--ink-faint); color:var(--ink);}
+  .recent-empty{font-size:0.78rem; color:var(--ink-faint); font-style:italic;}
+
+  footer.note{
+    margin-top:28px;
+    font-size:0.76rem;
+    color:var(--ink-faint);
+    max-width:72ch;
+    line-height:1.6;
+  }
+  footer.note code{
+    font-family:"IBM Plex Mono", monospace;
+    background:var(--surface-2);
+    padding:1px 5px;
+    border-radius:4px;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div class="brand">
+      <p class="eyebrow">Road to Top 5 · Link Prospecting</p>
+      <h1>The Link Farmer</h1>
+      <p class="tagline">Stack Google search-operator footprints to surface guest-post calls, resource pages, link roundups, citations and more.</p>
+    </div>
+    <div class="stat"><b id="footprintTotal">—</b> footprints · <b id="categoryTotal">—</b> categories</div>
+  </header>
+
+  <nav class="tabs" id="tabs" aria-label="Footprint category"></nav>
+
+  <main class="bench">
+
+    <section class="panel" aria-label="Footprint picker">
+      <h2>Build the query</h2>
+      <div class="field">
+        <label for="keyword">Keyword / niche</label>
+        <input id="keyword" type="text" autocomplete="off" spellcheck="false" placeholder="e.g. vegan protein powder">
+      </div>
+
+      <div class="two-col">
+        <div class="field">
+          <label for="excludeDomains">Exclude domains</label>
+          <input id="excludeDomains" type="text" autocomplete="off" spellcheck="false" placeholder="pinterest.com, quora.com">
+        </div>
+        <div class="field">
+          <label for="excludeTerms">Exclude terms</label>
+          <input id="excludeTerms" type="text" autocomplete="off" spellcheck="false" placeholder="sponsored, directory">
+        </div>
+      </div>
+      <div class="noise-row" id="noiseRow"></div>
+
+      <p class="footprint-count" id="footprintCount" style="margin-top:16px;"></p>
+      <div class="chips" id="chips" role="group" aria-label="Footprint operators — click to stack more than one"></div>
+    </section>
+
+    <section class="panel" aria-label="Assembled query and search options">
+      <h2>Search it</h2>
+      <div class="query-label">
+        <label for="queryPreview" id="queryPreviewLabel">Assembled query</label>
+        <button type="button" class="copy-btn" id="copyBtn">Copy</button>
+      </div>
+      <div class="query-box" id="queryPreview" aria-live="polite"></div>
+
+      <div class="seg-row">
+        <label id="timeLabel">Time range</label>
+        <div class="seg" id="timeSeg" role="group" aria-labelledby="timeLabel"></div>
+      </div>
+      <div class="seg-row">
+        <label id="resultsLabel">Results per page <span class="seg-note">— Google has capped real counts since Sep 2025</span></label>
+        <div class="seg" id="resultsSeg" role="group" aria-labelledby="resultsLabel"></div>
+      </div>
+      <div class="seg-row">
+        <label id="tldLabel">Domain filter</label>
+        <div class="seg" id="tldSeg" role="group" aria-labelledby="tldLabel"></div>
+      </div>
+      <div class="actions">
+        <a href="#" id="openSearch" class="btn primary" target="_blank" rel="noopener noreferrer">Open in Google →</a>
+        <button type="button" class="btn ghost" id="clearBtn">Reset</button>
+      </div>
+    </section>
+
+  </main>
+
+  <div class="recent">
+    <h2 style="font-family:'Archivo',sans-serif; font-size:0.7rem; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:var(--rose); margin:0 0 10px;">Recent queries</h2>
+    <div class="recent-list" id="recentList"></div>
+  </div>
+
+  <footer class="note">
+    Every footprint here is a literal Google search operator — quoted exact-match phrases, <code>intitle:</code>/<code>inurl:</code> filters, and <code>-</code> exclusions. Nothing is fetched or scraped on this page; picking footprints and a keyword just assembles a <code>google.com/search</code> URL and hands you off to Google to do the finding. Your last-used settings and recent-searches list stay local to this browser.
+  </footer>
+
+</div>
+<script>
+(function(){
+  "use strict";
+
+  var CATEGORIES = [
+    { key:"blogplatforms", label:"Blog Platforms", footprints:[
+      { name:"WordPress guest comments", value:'inurl:blog "leave a reply" "powered by WordPress"' },
+      { name:"BlogEngine.NET", value:'"Powered by BlogEngine.NET" inurl:blog "post a comment" -"comments closed" -"you must be logged in"' },
+      { name:"ExpressionEngine (blog + comment)", value:'"powered by expressionengine" inurl:blog "post a comment" -"comments closed" -"you must be logged in"' },
+      { name:"ExpressionEngine (comment)", value:'"powered by expressionengine" "post a comment"' },
+      { name:"ExpressionEngine (any)", value:'"powered by expressionengine"' },
+      { name:"Ghost", value:'"powered by Ghost"' },
+      { name:"Substack", value:'"powered by Substack"' },
+      { name:"Typepad", value:'"powered by Typepad"' },
+      { name:"WordPress, no comments yet (1)", value:'"no comments posted yet"' },
+      { name:"WordPress, no comments yet (2)", value:'"why not be the first to have your say"' }
+    ]},
+    { key:"forum", label:"Forums", footprints:[
+      { name:"Discourse", value:'"powered by Discourse"' },
+      { name:"XenForo", value:'"powered by XenForo"' },
+      { name:"IP.Board", value:'"powered by ip.board"' },
+      { name:"Fireboard", value:'"powered by Fireboard"' },
+      { name:"phpBB", value:'"powered by phpbb"' },
+      { name:"phpBB3", value:'"powered by phpbb3"' },
+      { name:"SMF", value:'"powered by SMF"' },
+      { name:"vBulletin", value:'"powered by vbulletin"' }
+    ]},
+    { key:"comment", label:"Comments", footprints:[
+      { name:"CommentLuv Premium", value:'"This blog uses premium CommentLuv" -"The version of CommentLuv on this site is no longer supported."' },
+      { name:"Do-follow comment form", value:'"Notify me of follow-up comments?" "Submit the word you see below:"' },
+      { name:"IntenseDebate", value:'"if you have a website, link to it here" "post a new comment"' },
+      { name:"KeywordLuv", value:'"Enter YourName@YourKeywords"' },
+      { name:"Livefyre", value:'"get livefyre" "comment help" -"Comments have been disabled for this post"' }
+    ]},
+    { key:"resource", label:"Resource Pages", footprints:[
+      { name:"intitle:resources", value:"intitle:resources" },
+      { name:"inurl:resources", value:"inurl:resources" },
+      { name:'"links"', value:'"links"' },
+      { name:"recommended sites", value:'"recommended sites"' },
+      { name:"resources", value:'"resources"' },
+      { name:"resource page", value:'"resource page"' },
+      { name:"resource pages", value:'"resource pages"' },
+      { name:"useful links", value:'"useful links"' },
+      { name:"helpful resources", value:'"helpful resources"' }
+    ]},
+    { key:"guestposts", label:"Guest Posts", footprints:[
+      { name:"accepting guest posts", value:'"accepting guest posts"' },
+      { name:"become a contributor", value:'"become a contributor"' },
+      { name:"become a guest writer", value:'"become a guest writer"' },
+      { name:"contribute to our site", value:'"contribute to our site"' },
+      { name:"contributor guidelines", value:'"contributor guidelines"' },
+      { name:"guest bloggers wanted", value:'"guest bloggers wanted"' },
+      { name:"guest post courtesy of", value:'"guest post courtesy of"' },
+      { name:"guest post guidelines", value:'"guest post guidelines"' },
+      { name:"guest post opportunities", value:'"guest post opportunities"' },
+      { name:"guest posts wanted", value:'"guest posts wanted"' },
+      { name:"I've been featured on", value:'"I’ve been featured on"' },
+      { name:"my guest blogs", value:'"my guest blogs"' },
+      { name:"my posts on other blogs", value:'"my posts on other blogs"' },
+      { name:"sites I've written for", value:'"sites I’ve written for"' },
+      { name:"submit article", value:'"submit article"' },
+      { name:"submit blog post", value:'"submit blog post"' },
+      { name:"submit guest post", value:'"submit guest post"' },
+      { name:"submit your content", value:'"submit your content"' },
+      { name:"this is a guest post by", value:'"this is a guest post by"' },
+      { name:"this post was written by", value:'"this post was written by"' },
+      { name:"write for us", value:'"write for us"' },
+      { name:"writers wanted", value:'"writers wanted"' }
+    ]},
+    { key:"linkroundup", label:"Link Roundups", footprints:[
+      { name:"best articles of the week", value:'"best articles of the week"' },
+      { name:"best of", value:'"best of"' },
+      { name:"best posts of the week", value:'"best posts of the week"' },
+      { name:"daily link roundup", value:'"daily link roundup"' },
+      { name:"friday link roundup", value:'"friday link roundup"' },
+      { name:"link roundup", value:'"link roundup"' },
+      { name:"monday link roundup", value:'"monday link roundup"' },
+      { name:"roundup", value:'"roundup"' },
+      { name:"this week", value:'"this week"' },
+      { name:"top posts this week", value:'"top posts this week"' },
+      { name:"weekly link roundup", value:'"weekly link roundup"' }
+    ]},
+    { key:"sponsor", label:"Sponsor / Donation", footprints:[
+      { name:"contributors page", value:'"contributors page"' },
+      { name:"donate to us", value:'"donate to us"' },
+      { name:"sponsors page", value:'"sponsors page"' }
+    ]},
+    { key:"podcast", label:"Podcast Guests", footprints:[
+      { name:"looking for guests", value:'"looking for guests"' },
+      { name:"be our guest", value:'"be our guest" podcast' },
+      { name:"apply to be a guest", value:'"apply to be a guest"' },
+      { name:"guest suggestions", value:'"guest suggestions" podcast' },
+      { name:"want to be on the show", value:'"want to be on the show"' },
+      { name:"be featured on our podcast", value:'"be featured on our podcast"' }
+    ]},
+    { key:"broken", label:"Broken Link Building", footprints:[
+      { name:"aging resource list", value:'intitle:"resources" "last updated" 2019..2022' },
+      { name:"link directory", value:'"link directory" inurl:links' },
+      { name:"helpful links (dated)", value:'"helpful links" "2018" OR "2019" OR "2020"' },
+      { name:"recommended tools", value:'"recommended tools" "resources"' },
+      { name:"further reading", value:'"further reading" "resources"' }
+    ]},
+    { key:"scholarship", label:"Scholarships", footprints:[
+      { name:"scholarship, apply by (edu)", value:'"scholarship" "apply by" site:edu' },
+      { name:"scholarships for (edu)", value:'"scholarships for" inurl:scholarships' },
+      { name:"scholarship + financial aid (edu)", value:'intitle:"scholarship" inurl:"financial-aid"' },
+      { name:"list of scholarships (edu)", value:'"list of scholarships"' }
+    ]},
+    { key:"directory", label:"Directories & Citations", footprints:[
+      { name:"add your business", value:'"add your business"' },
+      { name:"add url", value:'"add url" -site:google.com' },
+      { name:"submit your site", value:'"submit your site"' },
+      { name:"submit url", value:'"submit url"' },
+      { name:"suggest a site", value:'"suggest a site"' },
+      { name:"business directory", value:'inurl:business-directory' }
+    ]},
+    { key:"testimonial", label:"Testimonials", footprints:[
+      { name:"submit a testimonial", value:'"submit a testimonial"' },
+      { name:"share your experience", value:'"share your experience" testimonial' },
+      { name:"case study submission", value:'"case study submission"' },
+      { name:"customer spotlight", value:'"customer spotlight" submit' }
+    ]},
+    { key:"infographic", label:"Infographic Submission", footprints:[
+      { name:"submit your infographic", value:'"submit your infographic"' },
+      { name:"infographic directory", value:'"infographic directory"' },
+      { name:"submit infographic", value:'"submit infographic"' },
+      { name:"infographics, accepting submissions", value:'inurl:infographics "submit"' }
+    ]}
+  ];
+
+  var NOISE_DOMAINS = ["pinterest.com","quora.com","reddit.com","linkedin.com","facebook.com","youtube.com","wikipedia.org"];
+
+  var TIME_OPTS = [
+    { label:"Any time", value:"" },
+    { label:"Past week", value:"qdr:w" },
+    { label:"Past month", value:"qdr:m" },
+    { label:"Past year", value:"qdr:y" }
+  ];
+  var RESULTS_OPTS = [
+    { label:"10", value:"10" },
+    { label:"20", value:"20" },
+    { label:"30", value:"30" }
+  ];
+  var TLD_OPTS = [
+    { label:"Any TLD", value:"" },
+    { label:".edu", value:"site:edu" },
+    { label:".gov", value:"site:gov" }
+  ];
+  var state = {
+    categoryKey: CATEGORIES[0].key,
+    selections: {},          // categoryKey -> [indices]
+    keyword: "",
+    excludeDomains: "",
+    excludeTerms: "",
+    activeNoise: [],         // subset of NOISE_DOMAINS
+    time: TIME_OPTS[0].value,
+    results: RESULTS_OPTS[0].value,
+    tld: TLD_OPTS[0].value
+  };
+  state.selections[CATEGORIES[0].key] = [0];
+
+  function loadState(){
+    try{
+      var saved = JSON.parse(localStorage.getItem("dorkbench.state.v2") || "null");
+      if(saved && typeof saved === "object"){
+        if(CATEGORIES.some(function(c){ return c.key === saved.categoryKey; })) state.categoryKey = saved.categoryKey;
+        if(saved.selections && typeof saved.selections === "object") state.selections = saved.selections;
+        if(typeof saved.keyword === "string") state.keyword = saved.keyword;
+        if(typeof saved.excludeDomains === "string") state.excludeDomains = saved.excludeDomains;
+        if(typeof saved.excludeTerms === "string") state.excludeTerms = saved.excludeTerms;
+        if(Array.isArray(saved.activeNoise)) state.activeNoise = saved.activeNoise;
+        if(TIME_OPTS.some(function(o){ return o.value === saved.time; })) state.time = saved.time;
+        if(RESULTS_OPTS.some(function(o){ return o.value === saved.results; })) state.results = saved.results;
+        if(TLD_OPTS.some(function(o){ return o.value === saved.tld; })) state.tld = saved.tld;
+      }
+    }catch(e){ /* ignore */ }
+  }
+  function saveState(){
+    try{ localStorage.setItem("dorkbench.state.v2", JSON.stringify(state)); }catch(e){ /* ignore */ }
+  }
+  function getRecents(){
+    try{ return JSON.parse(localStorage.getItem("dorkbench.recent") || "[]"); }catch(e){ return []; }
+  }
+  function pushRecent(entry){
+    try{
+      var list = getRecents();
+      list.unshift(entry);
+      list = list.slice(0, 8);
+      localStorage.setItem("dorkbench.recent", JSON.stringify(list));
+      renderRecents();
+    }catch(e){ /* ignore */ }
+  }
+
+  function currentCategory(){
+    return CATEGORIES.filter(function(c){ return c.key === state.categoryKey; })[0] || CATEGORIES[0];
+  }
+  function selectedIndices(){
+    return state.selections[state.categoryKey] || [];
+  }
+  function toggleFootprint(i){
+    var cur = state.selections[state.categoryKey] ? state.selections[state.categoryKey].slice() : [];
+    var pos = cur.indexOf(i);
+    if(pos === -1) cur.push(i); else cur.splice(pos,1);
+    state.selections[state.categoryKey] = cur;
+  }
+
+  function escapeHtml(s){
+    return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  }
+  function highlight(str){
+    var parts = str.split(/(-"[^"]*"|-[\w.]+|"[^"]*"|site:[\w.]+|intitle:[\w"]+|inurl:[\w-]+)/g);
+    return parts.map(function(p){
+      if(!p) return "";
+      if(/^-/.test(p)) return '<span class="tok-exclude">' + escapeHtml(p) + '</span>';
+      if(/^"/.test(p)) return '<span class="tok-phrase">' + escapeHtml(p) + '</span>';
+      if(/^(site|intitle|inurl):/.test(p)) return '<span class="tok-site">' + escapeHtml(p) + '</span>';
+      return escapeHtml(p);
+    }).join("");
+  }
+
+  function splitList(str){
+    return str.split(/[,\s]+/).map(function(s){ return s.trim(); }).filter(Boolean);
+  }
+
+  function buildQueryText(){
+    var kw = state.keyword.trim();
+    var cat = currentCategory();
+    var footprintValues = selectedIndices().map(function(i){ return cat.footprints[i] ? cat.footprints[i].value : null; }).filter(Boolean);
+
+    var pieces = [];
+    if(kw) pieces.push(kw);
+    if(state.tld) pieces.push(state.tld);
+    footprintValues.forEach(function(v){ pieces.push(v); });
+
+    var seenDomains = {};
+    splitList(state.excludeDomains).concat(state.activeNoise).forEach(function(d){
+      var key = d.toLowerCase();
+      if(seenDomains[key]) return;
+      seenDomains[key] = true;
+      pieces.push("-site:" + d);
+    });
+
+    splitList(state.excludeTerms).forEach(function(t){
+      pieces.push(t.indexOf(" ") > -1 ? '-"' + t + '"' : "-" + t);
+    });
+
+    return pieces.join(" ");
+  }
+
+  function buildUrl(){
+    var params = new URLSearchParams();
+    params.set("q", buildQueryText());
+    if(state.results) params.set("num", state.results);
+    if(state.time) params.set("tbs", state.time);
+    return "https://www.google.com/search?" + params.toString();
+  }
+
+  function renderTabs(){
+    var tabs = document.getElementById("tabs");
+    tabs.innerHTML = "";
+    CATEGORIES.forEach(function(cat){
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = "tab" + (cat.key === state.categoryKey ? " is-active" : "");
+      b.textContent = cat.label;
+      b.setAttribute("aria-pressed", cat.key === state.categoryKey ? "true" : "false");
+      b.addEventListener("click", function(){
+        state.categoryKey = cat.key;
+        if(!state.selections[cat.key]) state.selections[cat.key] = [];
+        renderAll();
+      });
+      tabs.appendChild(b);
+    });
+  }
+
+  function renderNoise(){
+    var wrap = document.getElementById("noiseRow");
+    wrap.innerHTML = "";
+    NOISE_DOMAINS.forEach(function(d){
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = "noise-chip" + (state.activeNoise.indexOf(d) > -1 ? " is-active" : "");
+      b.textContent = "-" + d;
+      b.addEventListener("click", function(){
+        var pos = state.activeNoise.indexOf(d);
+        if(pos === -1) state.activeNoise.push(d); else state.activeNoise.splice(pos,1);
+        renderAll();
+      });
+      wrap.appendChild(b);
+    });
+  }
+
+  function renderChips(){
+    var cat = currentCategory();
+    var sel = selectedIndices();
+    var wrap = document.getElementById("chips");
+    wrap.innerHTML = "";
+    document.getElementById("footprintCount").textContent = cat.footprints.length + " footprint" + (cat.footprints.length === 1 ? "" : "s") + " in " + cat.label + " — click to stack more than one";
+    cat.footprints.forEach(function(fp, i){
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = "chip" + (sel.indexOf(i) > -1 ? " is-selected" : "");
+      b.textContent = fp.name;
+      b.title = fp.value;
+      b.addEventListener("click", function(){
+        toggleFootprint(i);
+        renderAll();
+      });
+      wrap.appendChild(b);
+    });
+  }
+
+  function renderSeg(containerId, options, currentValue, onPick){
+    var wrap = document.getElementById(containerId);
+    wrap.innerHTML = "";
+    options.forEach(function(opt){
+      var b = document.createElement("button");
+      b.type = "button";
+      b.textContent = opt.label;
+      b.className = opt.value === currentValue ? "is-active" : "";
+      b.addEventListener("click", function(){ onPick(opt.value); renderAll(); });
+      wrap.appendChild(b);
+    });
+  }
+
+  function renderQuery(){
+    var text = buildQueryText();
+    document.getElementById("queryPreview").innerHTML = highlight(text) || '<span style="color:var(--ink-faint)">Pick a footprint and type a keyword…</span>';
+    document.getElementById("openSearch").href = buildUrl();
+  }
+
+  function renderRecents(){
+    var list = getRecents();
+    var wrap = document.getElementById("recentList");
+    wrap.innerHTML = "";
+    if(!list.length){
+      wrap.innerHTML = '<span class="recent-empty">Run a search and it’ll show up here for quick re-use.</span>';
+      return;
+    }
+    list.forEach(function(item){
+      var a = document.createElement("a");
+      a.href = item.url;
+      a.target = "_blank";
+      a.rel = "noopener noreferrer";
+      a.className = "recent-chip";
+      a.textContent = item.label;
+      wrap.appendChild(a);
+    });
+  }
+
+  function renderCounts(){
+    var total = CATEGORIES.reduce(function(sum, c){ return sum + c.footprints.length; }, 0);
+    document.getElementById("footprintTotal").textContent = total;
+    document.getElementById("categoryTotal").textContent = CATEGORIES.length;
+  }
+
+  function renderAll(){
+    renderTabs();
+    renderNoise();
+    renderChips();
+    renderSeg("timeSeg", TIME_OPTS, state.time, function(v){ state.time = v; });
+    renderSeg("resultsSeg", RESULTS_OPTS, state.results, function(v){ state.results = v; });
+    renderSeg("tldSeg", TLD_OPTS, state.tld, function(v){ state.tld = v; });
+    renderQuery();
+    saveState();
+  }
+
+  document.getElementById("keyword").addEventListener("input", function(e){
+    state.keyword = e.target.value; renderQuery(); saveState();
+  });
+  document.getElementById("keyword").addEventListener("keypress", function(e){
+    if(e.which === 13 || e.key === "Enter") document.getElementById("openSearch").click();
+  });
+  document.getElementById("excludeDomains").addEventListener("input", function(e){
+    state.excludeDomains = e.target.value; renderQuery(); saveState();
+  });
+  document.getElementById("excludeTerms").addEventListener("input", function(e){
+    state.excludeTerms = e.target.value; renderQuery(); saveState();
+  });
+  document.getElementById("excludeDomains").value = state.excludeDomains;
+  document.getElementById("excludeTerms").value = state.excludeTerms;
+
+  document.getElementById("copyBtn").addEventListener("click", function(){
+    var text = buildQueryText();
+    var btn = document.getElementById("copyBtn");
+    function flash(msg){ var prev = btn.textContent; btn.textContent = msg; setTimeout(function(){ btn.textContent = prev; }, 1200); }
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(function(){ flash("Copied"); }).catch(function(){ flash("Copy failed"); });
+    }else{ flash("Copy unsupported"); }
+  });
+
+  document.getElementById("openSearch").addEventListener("click", function(){
+    var cat = currentCategory();
+    var names = selectedIndices().map(function(i){ return cat.footprints[i] ? cat.footprints[i].name : null; }).filter(Boolean);
+    pushRecent({
+      label: (state.keyword.trim() || "(no keyword)") + " · " + (names.join(" + ") || cat.label),
+      url: buildUrl(),
+      ts: Date.now()
+    });
+  });
+
+  document.getElementById("clearBtn").addEventListener("click", function(){
+    document.getElementById("keyword").value = "";
+    document.getElementById("excludeDomains").value = "";
+    document.getElementById("excludeTerms").value = "";
+    state.keyword = ""; state.excludeDomains = ""; state.excludeTerms = ""; state.activeNoise = [];
+    state.categoryKey = CATEGORIES[0].key;
+    state.selections = {}; state.selections[CATEGORIES[0].key] = [0];
+    state.time = TIME_OPTS[0].value; state.results = RESULTS_OPTS[0].value; state.tld = TLD_OPTS[0].value;
+    renderAll();
+    document.getElementById("keyword").focus();
+  });
+
+  loadState();
+  renderCounts();
+  renderAll();
+  document.getElementById("keyword").value = state.keyword;
+  renderRecents();
+  document.getElementById("keyword").focus();
+
+})();
+</script>
+</body>
+</html>
